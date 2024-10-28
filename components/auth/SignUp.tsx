@@ -17,9 +17,32 @@ const SignUpForm = () => {
   const [loading, setLoading] = useState(false);
 
 
-  const handleSignUp = async () => {
-    
+  const handleSignUp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/signup`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({ email, password }),
+      });
+
+      if (response.ok) {
+        console.log("Signup successful");
+      } else {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Signup failed');
+      }
+    } catch (error) {
+      console.error("Error signing up:", error);
+    } finally {
+      setLoading(false);
+    }
   };
+
 
   return (
     <>
@@ -70,13 +93,9 @@ const SignUpForm = () => {
               <p className="text-sm hidden md:text-zinc-200">
                 Enter your email below
               </p>
-              <p className="text-sm md:text-zinc-200">
-                We appericiate your interest in Nyaya Nidhi. Please reach out to
-                @nyayanidhi on Twitter for early access.
-              </p>
             </div>
             <div className={cn("grid gap-6")}>
-              <form className="hidden">
+              <form onSubmit={handleSignUp} className="">
                 <div className="grid gap-2">
                   <div className="grid gap-1">
                     <Label className="sr-only" htmlFor="email">
@@ -107,35 +126,17 @@ const SignUpForm = () => {
                       disabled={loading}
                     />
                   </div>
+
                   <Button
-                    onClick={handleSignUp}
+                    type="submit"
                     disabled={loading}
                     className="bg-zinc-700 hover:bg-zinc-600"
                   >
-                    Sign Up with Email
+                    {loading ? "Signing up..." : "Sign Up"}
                   </Button>
                 </div>
               </form>
-              {/* 
-                <div className="relative">
-                <div className="absolute inset-0 flex items-center">
-                <span className="w-full border-t" />
-                </div>
-                <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-background px-2 text-muted-foreground">
-                    Or continue with
-                </span>
-                </div>
-                </div>
-                <Button variant="outline" type="button" disabled={isLoading}>
-                    {isLoading ? (
-                    <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
-                    ) : (
-                    <Icons.gitHub className="mr-2 h-4 w-4" />
-                    )}{" "}
-                    GitHub
-                </Button> 
-            */}
+
             </div>
             <p className="px-8 text-center text-sm text-muted-foreground hidden">
               By clicking continue, you agree to our{" "}

@@ -21,27 +21,26 @@ const LoginForm = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      // Replace this with your authentication logic
-      // For example, calling your API endpoint:
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password }),
-      });
-
-      if (response.ok) {
-        router.push('/dashboard'); // Redirect to dashboard after successful login
-      } else {
-        throw new Error('Login failed');
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/signin`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include',
+          body: JSON.stringify({ email, password }),
+        });
+  
+        if (response.ok) {
+          console.log("Login successful");
+        } else {
+          const errorData = await response.json();
+          throw new Error(errorData.message || 'Login failed');
+        }
+      } catch (error) {
+        console.error("Error logging in:", error);
+      } finally {
+        setLoading(false);
       }
-    } catch (error) {
-      console.error("Error signing in:", error);
-      // Add error handling here (e.g., showing an error message to the user)
-    } finally {
-      setLoading(false);
-    }
   };
 
   // The rest of your JSX remains the same, just wrap the form in a <form> element
@@ -64,6 +63,8 @@ const LoginForm = () => {
         <div className="relative hidden h-full flex-col bg-muted p-10 text-white lg:flex dark:border-r">
           {/* Your existing left side content */}
         </div>
+        
+
 
         {/* Right side with form */}
         <div className="lg:p-8 flex items-center justify-center h-screen">
@@ -120,7 +121,7 @@ const LoginForm = () => {
               </div>
             </form>
 
-            <p className="px-8 text-center text-sm text-muted-foreground">
+            <p className="px-8 text-center text-sm text-muted-foreground hidden">
               By clicking continue, you agree to our{" "}
               <Link
                 href="/terms"
