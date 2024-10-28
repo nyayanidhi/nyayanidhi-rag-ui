@@ -9,6 +9,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
+import axios from "axios";
+
 
 const LoginForm = () => {
   const router = useRouter();
@@ -21,14 +23,17 @@ const LoginForm = () => {
     e.preventDefault();
     setLoading(true);
     try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/signin`, {
-          method: 'POST',
+      
+        const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_API_URL}/auth/signin`,
+        { email, password },
+        {
           headers: {
             'Content-Type': 'application/json',
           },
-          credentials: 'include',
-          body: JSON.stringify({ email, password }),
-        });
+          withCredentials: true, // equivalent to credentials: 'include'
+        }
+      );
   
         if (response.ok) {
           console.log("Login successful");
