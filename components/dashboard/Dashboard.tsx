@@ -1,20 +1,90 @@
 "use client";
 
-import { useProgressStore } from "@/hooks/useModelStore";
-import UploadDocs from "./UploadDocs";
-import FileSelectInteract from "./FileSelectInteract";
-import Output from "./Output";
+import { useState,useEffect } from "react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
+import Upscaler from "./Upscaler";
 import ChatOutput from "./ChatOutput";
 
+type UIMode = "chat" | "upscaler" | "downscaler";
+
+type SessionHistory = {
+  session_id: string;
+  queries: string[];
+};
+
 const Dashboard = () => {
-  const { bears } = useProgressStore();
+  const [uiMode, setUiMode] = useState<UIMode>("upscaler");
+  const [history, setHistory] = useState<SessionHistory[]>([]);
+
+  useEffect(() => {
+    fetchHistory();
+  }, []);
+
+  const fetchHistory = async () => {
+    try {
+      const response = await fetch('/api/userHistory');
+      const data = await response.json();
+      if (data.success) {
+        setHistory(data.data);
+      }
+    } catch (error) {
+      console.error('Failed to fetch history:', error);
+    }
+  };
+
+  const renderMainContent = () => {
+    switch (uiMode) {
+      case "upscaler":
+        return <Upscaler />;
+      case "chat":
+        return <ChatOutput />;
+      case "downscaler":
+        return <div>Downscaler Component (Coming Soon)</div>;
+      default:
+        return null;
+    }
+  };
 
   return (
-    <div className="container mt-16 flex flex-col gap-3">
-      {bears === 0 && <UploadDocs />}
-      {bears === 25 && <FileSelectInteract />}
-      {bears === 75 && <ChatOutput />}
-      {bears === 100 && <Output />}
+    <div className="flex h-screen">
+      {/* Left Sidebar */}
+      <div className="w-64 bg-zinc-900 text-white p-4 hidden md:block">
+        <h3 className="font-semibold mb-4">History</h3>
+        <div className="space-y-2">
+          {history.map((session) => (
+            <div key={session.session_id} className="p-2 hover:bg-zinc-800 rounded">
+              <p className="text-sm text-gray-400 mb-1">Session: {session.session_id.slice(0, 8)}...</p>
+              {session.queries.map((query, index) => (
+                <p key={query} className="text-xs text-gray-500 pl-2">
+                  Query {index + 1}: {query.slice(0, 8)}...
+                </p>
+              ))}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <div className="flex-1 flex flex-col">
+        {/* Mode Selector */}
+        <div className="p-4 border-b">
+          <Select onValueChange={(value: UIMode) => setUiMode(value)} defaultValue="upscaler">
+            <SelectTrigger className="w-[200px]">
+              <SelectValue placeholder="Select mode" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="upscaler">Upscaler</SelectItem>
+              <SelectItem value="chat">Chat</SelectItem>
+              <SelectItem value="downscaler">Downscaler</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* Dynamic Content */}
+        <div className="flex-1 overflow-auto">
+          {renderMainContent()}
+        </div>
+      </div>
     </div>
   );
 };

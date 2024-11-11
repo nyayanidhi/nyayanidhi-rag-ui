@@ -20,6 +20,7 @@ const SignUpForm = () => {
   const supabase = createClientComponentClient();
 
   const handleSignUp = async () => {
+
     const res = await supabase.auth.signUp({
       email,
       password,
