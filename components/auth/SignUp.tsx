@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
@@ -9,7 +10,6 @@ import { buttonVariants } from "@/components/ui/button";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 
 const SignUpForm = () => {
   const [email, setEmail] = useState("");
@@ -20,21 +20,16 @@ const SignUpForm = () => {
   const supabase = createClientComponentClient();
 
   const handleSignUp = async () => {
-
     const res = await supabase.auth.signUp({
       email,
       password,
-      options: {
-        emailRedirectTo: `${location.origin}/auth/callback`,
-      },
     });
 
-    console.log("result of sign up is", res);
+    console.log(res)
     router.refresh();
     setEmail("");
     setPassword("");
   };
-
 
   return (
     <>
@@ -48,7 +43,7 @@ const SignUpForm = () => {
         >
           Login
         </Link>
-        <div className="relative hidden h-full flex-col bg-muted p-10 lg:flex dark:border-r">
+        <div className="relative h-full flex-col bg-muted p-10 lg:flex dark:border-r">
           <div className="absolute inset-0 " />
           <div className="relative z-20 flex items-center text-lg font-medium">
             <svg
@@ -82,12 +77,12 @@ const SignUpForm = () => {
               <h1 className="text-2xl font-semibold tracking-tight">
                 Create your account
               </h1>
-              <p className="text-sm hidden md:text-zinc-200">
+              <p className="text-sm  md:text-zinc-200">
                 Enter your email below
               </p>
             </div>
             <div className={cn("grid gap-6")}>
-              <form onSubmit={handleSignUp} className="">
+              <form className="">
                 <div className="grid gap-2">
                   <div className="grid gap-1">
                     <Label className="sr-only" htmlFor="email">
@@ -111,25 +106,42 @@ const SignUpForm = () => {
                     <Input
                       id="password"
                       type="password"
-                      placeholder="password"
+                      placeholder="Password"
                       onChange={(e) => setPassword(e.target.value)}
                       autoCapitalize="none"
                       autoCorrect="off"
                       disabled={loading}
-                      className="text-black dark:text-white"
                     />
                   </div>
-
                   <Button
-                    type="submit"
+                    onClick={handleSignUp}
                     disabled={loading}
                     className="bg-zinc-700 hover:bg-zinc-600"
                   >
-                    {loading ? "Signing up..." : "Sign Up"}
+                    Sign Up with Email
                   </Button>
                 </div>
               </form>
-
+              {/* 
+                <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                <span className="w-full border-t" />
+                </div>
+                <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-background px-2 text-muted-foreground">
+                    Or continue with
+                </span>
+                </div>
+                </div>
+                <Button variant="outline" type="button" disabled={isLoading}>
+                    {isLoading ? (
+                    <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
+                    ) : (
+                    <Icons.gitHub className="mr-2 h-4 w-4" />
+                    )}{" "}
+                    GitHub
+                </Button> 
+            */}
             </div>
             <p className="px-8 text-center text-sm text-muted-foreground hidden">
               By clicking continue, you agree to our{" "}

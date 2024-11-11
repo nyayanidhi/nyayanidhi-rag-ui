@@ -1,6 +1,5 @@
+import getServerUser from "@/helpers/getServerUser";
 import axios, { AxiosError } from "axios";
-import getServerUser from "./getServerUser";
-
 
 interface ApiResponse {
   success: boolean;

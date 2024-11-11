@@ -4,7 +4,6 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
 export default async function SignUp() {
-
   const cookieStore = cookies();
   const supabase = createServerComponentClient({ cookies: () => cookieStore });
 
@@ -15,5 +14,6 @@ export default async function SignUp() {
   if (user) {
     return redirect("/");
   }
+
   return <SignUpForm />;
 }
