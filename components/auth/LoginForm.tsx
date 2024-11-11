@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 
 import { buttonVariants } from "@/components/ui/button";
 import { Button } from "@/components/ui/button";
@@ -12,35 +13,27 @@ import { cn } from "@/lib/utils";
 
 const LoginForm = () => {
   const router = useRouter();
+  const supabase = createClientComponentClient();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleSignIn = async (e: React.FormEvent) => {
-    e.preventDefault();
     setLoading(true);
     try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/signin`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          credentials: 'include',
-          body: JSON.stringify({ email, password }),
-        });
-  
-        if (response.ok) {
-          console.log("Login successful");
-        } else {
-          const errorData = await response.json();
-          throw new Error(errorData.message || 'Login failed');
-        }
-      } catch (error) {
-        console.error("Error logging in:", error);
-      } finally {
-        setLoading(false);
-      }
+      const res = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+      router.refresh();
+      setEmail("");
+      setPassword("");
+    } catch (error) {
+      console.error("Error signing in:", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   // The rest of your JSX remains the same, just wrap the form in a <form> element

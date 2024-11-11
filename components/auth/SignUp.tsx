@@ -9,6 +9,7 @@ import { buttonVariants } from "@/components/ui/button";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 
 const SignUpForm = () => {
   const [email, setEmail] = useState("");
@@ -16,31 +17,22 @@ const SignUpForm = () => {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
 
+  const supabase = createClientComponentClient();
 
-  const handleSignUp = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/signup`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-        body: JSON.stringify({ email, password }),
-      });
+  const handleSignUp = async () => {
 
-      if (response.ok) {
-        console.log("Signup successful");
-      } else {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Signup failed');
-      }
-    } catch (error) {
-      console.error("Error signing up:", error);
-    } finally {
-      setLoading(false);
-    }
+    const res = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        emailRedirectTo: `${location.origin}/auth/callback`,
+      },
+    });
+
+    console.log("result of sign up is", res);
+    router.refresh();
+    setEmail("");
+    setPassword("");
   };
 
 
@@ -124,6 +116,7 @@ const SignUpForm = () => {
                       autoCapitalize="none"
                       autoCorrect="off"
                       disabled={loading}
+                      className="text-black dark:text-white"
                     />
                   </div>
 
