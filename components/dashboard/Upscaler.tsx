@@ -12,6 +12,7 @@ import {
     DialogTitle,
   } from "@/components/ui/dialog";
   import { Loader2 } from "lucide-react";
+import Results from "./Results";
 
 type UpscalerForm = {
   case_type: string;
@@ -30,6 +31,8 @@ const Upscaler = () => {
     session_id: uuidv4(),
   });
   const [isLoading, setIsLoading] = useState(false);
+  const [results, setResults] = useState<any>(null);
+  const [showResults, setShowResults] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -47,7 +50,8 @@ const Upscaler = () => {
       const data = await response.json();
       
       if (data.success) {
-        console.log('Upscaler Response:', data);
+        setResults(data.data.case_details);
+        setShowResults(true);
       } else {
         console.error('Failed to process upscaler request:', data);
       }
@@ -58,10 +62,25 @@ const Upscaler = () => {
     }
   };
 
+  const toggleView = () => {
+    setShowResults(!showResults);
+  };
+
+  if (showResults && results) {
+    return <Results cases={results} onBack={toggleView} />;
+  }
+
   return (
     <>
       <div className="p-6 max-w-4xl mx-auto w-full">
-        <h2 className="text-2xl font-bold mb-6">Legal Document Upscaler</h2>
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-2xl font-bold">Legal Document Upscaler</h2>
+          {results && (
+            <Button onClick={toggleView} variant="outline">
+              View Results
+            </Button>
+          )}
+        </div>
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-2">
             <Label htmlFor="case_type">Case Type</Label>

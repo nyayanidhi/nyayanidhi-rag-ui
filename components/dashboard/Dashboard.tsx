@@ -48,7 +48,7 @@ const Dashboard = () => {
   return (
     <div className="flex h-screen">
       {/* Left Sidebar */}
-      <div className="w-64 bg-zinc-900 text-white p-4 hidden md:block">
+      {/* <div className="w-64 bg-zinc-900 text-white p-4 hidden md:block">
         <h3 className="font-semibold mb-4">History</h3>
         <div className="space-y-2">
           {history.map((session) => (
@@ -59,7 +59,7 @@ const Dashboard = () => {
             ))
           ))}
         </div>
-      </div>
+      </div> */}
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col">
