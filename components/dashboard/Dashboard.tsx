@@ -3,6 +3,7 @@
 import { useState,useEffect } from "react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import Upscaler from "./Upscaler";
+import Downscaler from "./Downscaler";
 
 type UIMode =  "upscaler" | "downscaler";
 
@@ -36,7 +37,7 @@ const Dashboard = () => {
       case "upscaler":
         return <Upscaler />;
       case "downscaler":
-        return <div>Downscaler Component (Coming Soon)</div>;
+        return <Downscaler />
       default:
         return null;
     }
