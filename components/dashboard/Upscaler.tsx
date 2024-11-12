@@ -14,6 +14,13 @@ import {
   import { Loader2 } from "lucide-react";
 import Results from "./Results";
 
+type CaseDetail = {
+    case_name: string;
+    scr_citation: string;
+    neutral_citation: string;
+    digi_url: string;
+  };
+
 type UpscalerForm = {
   case_type: string;
   facts_at_hand: string;
@@ -21,6 +28,11 @@ type UpscalerForm = {
   prayer_sought: string;
    session_id: string,
 };
+
+type UpscalerResponse = {
+    case_details: CaseDetail[];
+    query_id: string;
+  };
 
 const Upscaler = () => {
   const [formData, setFormData] = useState<UpscalerForm>({
@@ -50,7 +62,10 @@ const Upscaler = () => {
       const data = await response.json();
       
       if (data.success) {
-        setResults(data.data.case_details);
+        setResults({
+          case_details: data.data.case_details,
+          query_id: data.data.query_id
+        });
         setShowResults(true);
       } else {
         console.error('Failed to process upscaler request:', data);
@@ -67,7 +82,9 @@ const Upscaler = () => {
   };
 
   if (showResults && results) {
-    return <Results cases={results} onBack={toggleView} />;
+    return <Results cases={results.case_details} 
+    queryId={results.query_id}
+    onBack={toggleView}  />;
   }
 
   return (
