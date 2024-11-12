@@ -15,15 +15,11 @@ export default async function Home() {
   const emailId = user.email ?? null;
 
   
-  // if (!emailId) {
-  //   // return redirect("/server-error");
-  // }
+  if (!emailId) {
+  return redirect("/server-error");
+  }
 
-  const chkUser = await checkUser(emailId);
 
-  // if (!chkUser.success) {
-  //   // return redirect("/server-error");
-  // }
 
   return (
     <main>
