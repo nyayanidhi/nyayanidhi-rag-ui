@@ -65,10 +65,12 @@ const Chat = ({ digi_url, neutral_citation, query_id, onClose }: ChatProps) => {
   };
 
   return (
-    <div className="flex flex-col h-full border-l">
-      <div className="flex justify-between items-center p-4 border-b">
-        <h3 className="font-semibold">Chat</h3>
-        <Button variant="ghost" size="sm" onClick={onClose}>×</Button>
+    <div className="flex flex-col h-full">
+      <div className="p-4 border-b sticky top-0 bg-white">
+        <div className="flex justify-between items-center">
+          <h3 className="font-semibold">Chat</h3>
+          <Button variant="ghost" size="sm" onClick={onClose}>×</Button>
+        </div>
       </div>
 
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
@@ -100,19 +102,21 @@ const Chat = ({ digi_url, neutral_citation, query_id, onClose }: ChatProps) => {
         <div ref={messagesEndRef} />
       </div>
 
-      <form onSubmit={handleSubmit} className="p-4 border-t">
-        <div className="flex gap-2">
-          <Input
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            placeholder="Type your message..."
-            disabled={isLoading}
-          />
-          <Button type="submit" disabled={isLoading}>
-            Send
-          </Button>
-        </div>
-      </form>
+      <div className="p-4 border-t sticky bottom-0 bg-white">
+        <form onSubmit={handleSubmit}>
+          <div className="flex gap-2">
+            <Input
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              placeholder="Type your message..."
+              disabled={isLoading}
+            />
+            <Button type="submit" disabled={isLoading}>
+              Send
+            </Button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 };

@@ -19,9 +19,9 @@ const Results = ({ cases, queryId, onBack }: ResultsProps) => {
   const [activeChatCase, setActiveChatCase] = useState<CaseDetail | null>(null);
 
   return (
-    <div className="flex h-screen">
-      <div className={`p-6 ${activeChatCase ? 'w-1/2' : 'w-full'}`}>
-        <div className="flex justify-between items-center mb-6">
+    <div className="flex h-[calc(100vh-80px)]">
+      <div className={`overflow-y-auto ${activeChatCase ? 'w-1/2' : 'w-full'} p-6`}>
+        <div className="flex justify-between items-center mb-6 sticky top-0 bg-white">
           <h2 className="text-2xl font-bold">Search Results</h2>
           <Button onClick={onBack} variant="outline">Back to Search</Button>
         </div>
@@ -71,7 +71,7 @@ const Results = ({ cases, queryId, onBack }: ResultsProps) => {
       </div>
 
       {activeChatCase && (
-        <div className="w-1/2 border-l">
+        <div className="w-1/2 border-l flex flex-col">
           <Chat
             digi_url={activeChatCase.digi_url}
             neutral_citation={activeChatCase.neutral_citation}
