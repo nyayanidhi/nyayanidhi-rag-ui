@@ -30,6 +30,13 @@ const Chat = ({ digi_url, neutral_citation, query_id, onClose }: ChatProps) => {
     scrollToBottom();
   }, [messages]);
 
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSubmit(e);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!input.trim() || isLoading) return;
@@ -105,11 +112,14 @@ const Chat = ({ digi_url, neutral_citation, query_id, onClose }: ChatProps) => {
       <div className="p-4 border-t sticky bottom-0 bg-white">
         <form onSubmit={handleSubmit}>
           <div className="flex gap-2">
-            <Input
+            <textarea
               value={input}
               onChange={(e) => setInput(e.target.value)}
+              onKeyDown={handleKeyDown}
               placeholder="Type your message..."
               disabled={isLoading}
+              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 min-h-[80px] resize-none"
+              rows={3}
             />
             <Button type="submit" disabled={isLoading}>
               Send
