@@ -52,14 +52,11 @@ const Dashboard = () => {
         <h3 className="font-semibold mb-4">History</h3>
         <div className="space-y-2">
           {history.map((session) => (
-            <div key={session.session_id} className="p-2 hover:bg-zinc-800 rounded">
-              <p className="text-sm text-gray-400 mb-1">Session: {session.session_id.slice(0, 8)}...</p>
-              {session.queries.map((query, index) => (
-                <p key={query} className="text-xs text-gray-500 pl-2">
-                  Query {index + 1}: {query.slice(0, 8)}...
-                </p>
-              ))}
-            </div>
+            session.queries.map((query) => (
+              <div key={query} className="p-2 hover:bg-zinc-800 rounded">
+                <p className="text-sm text-gray-400">{query}</p>
+              </div>
+            ))
           ))}
         </div>
       </div>
