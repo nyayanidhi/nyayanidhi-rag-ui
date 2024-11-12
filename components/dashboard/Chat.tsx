@@ -12,10 +12,11 @@ type ChatProps = {
   digi_url: string;
   neutral_citation: string;
   query_id: string;
+  caseName: string;  // Add this prop
   onClose: () => void;
 };
 
-const Chat = ({ digi_url, neutral_citation, query_id, onClose }: ChatProps) => {
+const Chat = ({ digi_url, neutral_citation, query_id, caseName, onClose }: ChatProps) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -75,7 +76,9 @@ const Chat = ({ digi_url, neutral_citation, query_id, onClose }: ChatProps) => {
     <div className="flex flex-col h-full">
       <div className="p-4 border-b sticky top-0 bg-white">
         <div className="flex justify-between items-center">
-          <h3 className="font-semibold">Chat</h3>
+          <div className="flex flex-col max-w-[90%]">
+            <h3 className="font-semibold truncate">{caseName}</h3>
+          </div>
           <Button variant="ghost" size="sm" onClick={onClose}>×</Button>
         </div>
       </div>

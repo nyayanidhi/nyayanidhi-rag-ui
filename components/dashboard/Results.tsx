@@ -71,12 +71,13 @@ const Results = ({ cases, queryId, onBack }: ResultsProps) => {
       </div>
 
       {activeChatCase && (
-        <div className="w-1/2 border-l flex flex-col">
+        <div className="w-1/2 border-l">
           <Chat
             digi_url={activeChatCase.digi_url}
             neutral_citation={activeChatCase.neutral_citation}
             query_id={queryId}
             onClose={() => setActiveChatCase(null)}
+            caseName={activeChatCase.case_name}
           />
         </div>
       )}

@@ -3,9 +3,8 @@
 import { useState,useEffect } from "react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import Upscaler from "./Upscaler";
-import ChatOutput from "./ChatOutput";
 
-type UIMode = "chat" | "upscaler" | "downscaler";
+type UIMode =  "upscaler" | "downscaler";
 
 type SessionHistory = {
   session_id: string;
@@ -36,8 +35,6 @@ const Dashboard = () => {
     switch (uiMode) {
       case "upscaler":
         return <Upscaler />;
-      case "chat":
-        return <ChatOutput />;
       case "downscaler":
         return <div>Downscaler Component (Coming Soon)</div>;
       default:
@@ -71,7 +68,6 @@ const Dashboard = () => {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="upscaler">Upscaler</SelectItem>
-              <SelectItem value="chat">Chat</SelectItem>
               <SelectItem value="downscaler">Downscaler</SelectItem>
             </SelectContent>
           </Select>
