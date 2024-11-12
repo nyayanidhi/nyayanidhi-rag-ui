@@ -61,8 +61,9 @@ const Results = ({ cases, queryId, onBack }: ResultsProps) => {
                   size="sm"
                   onClick={() => setActiveChatCase(caseItem)}
                   className="text-blue-600"
+                  disabled={activeChatCase !== null && activeChatCase.neutral_citation !== caseItem.neutral_citation}
                 >
-                  Chat
+                  {activeChatCase?.neutral_citation === caseItem.neutral_citation ? 'Chatting...' : 'Chat'}
                 </Button>
               </div>
             </div>
