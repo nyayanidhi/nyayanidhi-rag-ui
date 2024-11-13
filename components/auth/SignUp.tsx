@@ -19,17 +19,44 @@ const SignUpForm = () => {
 
   const supabase = createClientComponentClient();
 
-  const handleSignUp = async () => {
+  const handleSignUp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    try {
+      const signUpRes = await supabase.auth.signUp({
+        email,
+        password,
+      });
+      console.log('Sign up response:', signUpRes);
+    } catch (error) {
+      console.error("Sign up error:", error);
+    }
 
-    const res = await supabase.auth.signUp({
-      email,
-      password,
-    });
+    // Continue with sign in regardless of sign up result
+    console.log('Waiting 2 seconds before sign in...');
+    await new Promise(resolve => setTimeout(resolve, 2000));
 
-    console.log(res)
-    router.refresh();
-    setEmail("");
-    setPassword("");
+    try {
+      const signInRes = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (signInRes.error) {
+        console.error("Auto sign in error:", signInRes.error);
+        router.push('/login');
+        return;
+      }
+
+      console.log('Sign in successful');
+      router.refresh();
+      setEmail("");
+      setPassword("");
+      
+    } catch (error) {
+      console.error("Sign in error:", error);
+      router.push('/login');
+    }
   };
 
   return (
