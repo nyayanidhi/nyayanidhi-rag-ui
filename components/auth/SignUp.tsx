@@ -140,6 +140,7 @@ const SignUpForm = () => {
                       autoComplete="email"
                       autoCorrect="off"
                       disabled={loading}
+                      className="bg-white text-black"
                     />
                   </div>
                   <div className="grid gap-1">
@@ -154,6 +155,7 @@ const SignUpForm = () => {
                       autoCapitalize="none"
                       autoCorrect="off"
                       disabled={loading}
+                      className="bg-white text-black"
                     />
                   </div>
                   <Button
