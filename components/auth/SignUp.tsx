@@ -28,35 +28,37 @@ const SignUpForm = () => {
         password,
       });
       console.log('Sign up response:', signUpRes);
+
+      if(signUpRes.data) {
+        
+        //set user in postgres db
+        try {
+          const signInRes = await supabase.auth.signInWithPassword({
+            email,
+            password,
+          });
+    
+          if (signInRes.error) {
+            console.error("Auto sign in error:", signInRes.error);
+            router.push('/login');
+            return;
+          }
+    
+          console.log('Sign in successful');
+          router.push('/plans');
+          setEmail("");
+          setPassword("");
+          
+        } catch (error) {
+          console.error("Sign in error:", error);
+          router.push('/login');
+        }
+      }
     } catch (error) {
       console.error("Sign up error:", error);
     }
 
-    // Continue with sign in regardless of sign up result
-    console.log('Waiting 2 seconds before sign in...');
-    await new Promise(resolve => setTimeout(resolve, 2000));
-
-    try {
-      const signInRes = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-
-      if (signInRes.error) {
-        console.error("Auto sign in error:", signInRes.error);
-        router.push('/login');
-        return;
-      }
-
-      console.log('Sign in successful');
-      router.refresh();
-      setEmail("");
-      setPassword("");
-      
-    } catch (error) {
-      console.error("Sign in error:", error);
-      router.push('/login');
-    }
+    
   };
 
   return (

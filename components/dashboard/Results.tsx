@@ -1,6 +1,13 @@
 import { useEffect, useState } from 'react';
 import { Button } from "../ui/button";
 import Chat from "./Chat"
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogDescription,
+  } from "@/components/ui/dialog";
 
 type CaseDetail = {
   case_name: string;
@@ -17,6 +24,13 @@ type ResultsProps = {
 
 const Results = ({ cases, queryId, onBack }: ResultsProps) => {
   const [activeChatCase, setActiveChatCase] = useState<CaseDetail | null>(null);
+  const [showSummary, setShowSummary] = useState(false);
+  const [selectedCase, setSelectedCase] = useState<CaseDetail | null>(null);
+
+  const handleViewDocument = (caseItem: CaseDetail) => {
+    setSelectedCase(caseItem);
+    setShowSummary(true);
+  };
 
   return (
     <div className="flex h-[calc(100vh-80px)]">
@@ -33,11 +47,11 @@ const Results = ({ cases, queryId, onBack }: ResultsProps) => {
                 href={caseItem.digi_url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="hover:text-blue-600"
+                className="font-semibold text-lg mb-2 text-blue-600 hover:underline"
               >
-                <h3 className="font-semibold text-lg mb-2">{caseItem.case_name}</h3>
+                {caseItem.case_name}
               </a>
-              <div className="grid grid-cols-2 gap-4 text-sm">
+              <div className="grid grid-cols-2 gap-4 text-sm mt-2">
                 <div>
                   <p className="text-gray-600">SCR Citation:</p>
                   <p>{caseItem.scr_citation}</p>
@@ -48,14 +62,14 @@ const Results = ({ cases, queryId, onBack }: ResultsProps) => {
                 </div>
               </div>
               <div className="mt-3 flex gap-2">
-                <a 
-                  href={caseItem.digi_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-blue-600 hover:underline text-sm"
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => handleViewDocument(caseItem)}
+                  className="text-blue-600 hover:underline"
                 >
-                  View Document →
-                </a>
+                  View Summary →
+                </Button>
                 <Button
                   variant="ghost"
                   size="sm"
@@ -82,6 +96,26 @@ const Results = ({ cases, queryId, onBack }: ResultsProps) => {
           />
         </div>
       )}
+
+      <Dialog open={showSummary} onOpenChange={setShowSummary}>
+        <DialogContent className="max-w-3xl h-[80vh]">
+          <DialogHeader>
+            <DialogTitle>Summary of the Case</DialogTitle>
+            <DialogDescription className="text-lg font-medium">
+              {selectedCase?.case_name}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="overflow-y-auto mt-4 pr-4 text-justify">
+            <p className="whitespace-pre-wrap leading-relaxed">
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+
+              Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+
+              Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.
+            </p>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
