@@ -12,7 +12,9 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
+  DialogFooter,
 } from "@/components/ui/dialog";
+import { useRouter } from 'next/navigation';
 
 type DownscalerProps = {
   onBack: () => void;
@@ -29,18 +31,31 @@ const Downscaler = () => {
   const [caseType, setCaseType] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
   const [results, setResults] = useState<any>(null);
-  const [error, setError] = useState("");
+  const [error, setError] = useState<{
+    show: boolean;
+    message: string;
+    isSubscriptionError: boolean;
+  }>({
+    show: false,
+    message: "",
+    isSubscriptionError: false,
+  });
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [showResults, setShowResults] = useState(false);
+  const router = useRouter();
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
-    setError("");
+    setError({ show: false, message: "", isSubscriptionError: false });
 
     if (!selectedFile) return;
 
     if (!ALLOWED_FILE_TYPES.includes(selectedFile.type)) {
-      setError("Please upload only .doc or .docx files");
+      setError({
+        show: true,
+        message: "Please upload only .doc or .docx files",
+        isSubscriptionError: false
+      });
       if (fileInputRef.current) fileInputRef.current.value = "";
       return;
     }
@@ -50,15 +65,23 @@ const Downscaler = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError("");
+    setError({ show: false, message: "", isSubscriptionError: false });
 
     if (!file) {
-      setError("Please select a file");
+      setError({
+        show: true,
+        message: "Please select a file",
+        isSubscriptionError: false
+      });
       return;
     }
 
     if (!caseType) {
-      setError("Please select a case type");
+      setError({
+        show: true,
+        message: "Please select a case type",
+        isSubscriptionError: false
+      });
       return;
     }
 
@@ -76,6 +99,24 @@ const Downscaler = () => {
         body: formData,
       });
 
+      if (response.status === 403) {
+        setError({
+          show: true,
+          message: "Please check your subscription plan",
+          isSubscriptionError: true,
+        });
+        return;
+      }
+
+      if (response.status === 500) {
+        setError({
+          show: true,
+          message: "Error processing request. Please try in sometime",
+          isSubscriptionError: false,
+        });
+        return;
+      }
+
       const data = await response.json();
 
       if (data.success) {
@@ -86,11 +127,19 @@ const Downscaler = () => {
         setShowResults(true);
       } else {
         console.error('Failed to process downscaler request:', data);
-        setError(data.data || "Failed to process request");
+        setError({
+          show: true,
+          message: "An unexpected error occurred. Please try again.",
+          isSubscriptionError: false
+        });
       }
     } catch (err) {
       console.error('Error submitting form:', err);
-      setError("An unexpected error occurred. Please try again.");
+      setError({
+        show: true,
+        message: "An unexpected error occurred. Please try again.",
+        isSubscriptionError: false
+      });
     } finally {
       setIsLoading(false);
     }
@@ -153,8 +202,6 @@ const Downscaler = () => {
             <p className="text-sm text-gray-500">Only .doc or .docx files are allowed</p>
           </div>
 
-          {error && <p className="text-red-500 text-sm">{error}</p>}
-
           <Button type="submit" className="w-full" disabled={isLoading}>
             {isLoading ? (
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -163,6 +210,24 @@ const Downscaler = () => {
           </Button>
         </form>
       </div>
+
+      <Dialog open={error.show} onOpenChange={(open) => setError(prev => ({ ...prev, show: open }))}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Error</DialogTitle>
+            <DialogDescription>
+              {error.message}
+            </DialogDescription>
+          </DialogHeader>
+          {error.isSubscriptionError && (
+            <DialogFooter>
+              <Button onClick={() => router.push('/plans')}>
+                View Plans
+              </Button>
+            </DialogFooter>
+          )}
+        </DialogContent>
+      </Dialog>
 
       <Dialog open={isLoading} onOpenChange={setIsLoading}>
         <DialogContent className="sm:max-w-md" hideClose>

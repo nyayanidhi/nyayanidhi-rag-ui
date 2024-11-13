@@ -29,11 +29,38 @@ export async function POST(req: Request) {
       success: true,
       data: resp.data,
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error(error);
-    return NextResponse.json({
-      success: false,
-      data: "Failed to process downscaler request",
-    });
+    
+    // Handle subscription error (403)
+    if (error.response?.status === 403) {
+      return NextResponse.json(
+        {
+          success: false,
+          data: "Please check your subscription plan",
+        },
+        { status: 403 }
+      );
+    }
+
+    // Handle server error (500)
+    if (error.response?.status === 500) {
+      return NextResponse.json(
+        {
+          success: false,
+          data: "Error processing request. Please try in sometime",
+        },
+        { status: 500 }
+      );
+    }
+
+    // Handle other errors
+    return NextResponse.json(
+      {
+        success: false,
+        data: "Failed to process downscaler request",
+      },
+      { status: error.response?.status || 500 }
+    );
   }
 }

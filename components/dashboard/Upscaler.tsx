@@ -10,9 +10,12 @@ import {
     DialogDescription,
     DialogHeader,
     DialogTitle,
+    DialogFooter,
   } from "@/components/ui/dialog";
   import { Loader2 } from "lucide-react";
 import Results from "./Results";
+import { useRouter } from 'next/navigation';
+
 
 type CaseDetail = {
     case_name: string;
@@ -35,6 +38,7 @@ type UpscalerResponse = {
   };
 
 const Upscaler = () => {
+  const router = useRouter();
   const [formData, setFormData] = useState<UpscalerForm>({
     case_type: "",
     facts_at_hand: "",
@@ -45,10 +49,20 @@ const Upscaler = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [results, setResults] = useState<any>(null);
   const [showResults, setShowResults] = useState(false);
+  const [error, setError] = useState<{
+    show: boolean;
+    message: string;
+    isSubscriptionError: boolean;
+  }>({
+    show: false,
+    message: "",
+    isSubscriptionError: false,
+  });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    setError({ show: false, message: "", isSubscriptionError: false });
     
     try {
       const response = await fetch('/api/upscaler', {
@@ -58,6 +72,25 @@ const Upscaler = () => {
         },
         body: JSON.stringify(formData),
       });
+
+      if (response.status === 403) {
+        console.log("subscription error");
+        setError({
+          show: true,
+          message: "Please check your subscription plan",
+          isSubscriptionError: true,
+        });
+        return;
+      }
+
+      if (response.status === 500) {
+        setError({
+          show: true,
+          message: "Error processing request. Please try in sometime",
+          isSubscriptionError: false,
+        });
+        return;
+      }
 
       const data = await response.json();
       
@@ -72,6 +105,11 @@ const Upscaler = () => {
       }
     } catch (error) {
       console.error('Error submitting form:', error);
+      setError({
+        show: true,
+        message: "Error processing request. Please try in sometime",
+        isSubscriptionError: false,
+      });
     } finally {
       setIsLoading(false);
     }
@@ -149,6 +187,24 @@ const Upscaler = () => {
           </Button>
         </form>
       </div>
+
+      <Dialog open={error.show} onOpenChange={(open) => setError(prev => ({ ...prev, show: open }))}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Error</DialogTitle>
+            <DialogDescription>
+              {error.message}
+            </DialogDescription>
+          </DialogHeader>
+          {error.isSubscriptionError && (
+            <DialogFooter>
+              <Button onClick={() => router.push('/plans')}>
+                View Plans
+              </Button>
+            </DialogFooter>
+          )}
+        </DialogContent>
+      </Dialog>
 
       <Dialog open={isLoading} onOpenChange={setIsLoading}>
         <DialogContent className="sm:max-w-md" hideClose>
