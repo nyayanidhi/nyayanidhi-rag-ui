@@ -33,6 +33,19 @@ const SignUpForm = () => {
         
         //set user in postgres db
         try {
+          const createUserRes = await fetch('/api/createUser', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ email }),
+          });
+      
+          if (!createUserRes.ok) {
+            console.error('Failed to create user', email);
+            
+          }
+      
           const signInRes = await supabase.auth.signInWithPassword({
             email,
             password,

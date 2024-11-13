@@ -1,20 +1,75 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { useEffect } from "react";
+import { useState } from "react";
+
+interface PlanDetails {
+    user_email: string;
+    plan: number;
+    subscription_start_date: string;
+    subscription_end_date: string;
+  }
 
 export default function Plans() {
+  const [planDetails, setPlanDetails] = useState<PlanDetails | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchPlanDetails = async () => {
+      try {
+        const response = await fetch('/api/userPlan');
+        const data = await response.json();
+        if (data.success) {
+          setPlanDetails(data.data);
+        }
+      } catch (error) {
+        console.error('Failed to fetch plan details:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPlanDetails();
+  }, []);
+
+  const simplePlan = 'Basic Plan'
+  const premiumPlan = 'Premium Plan'
+
+  const getPlanMessage = () => {
+    if (!planDetails) return '';
+    
+    switch (planDetails.plan) {
+      case 0:
+        return '';
+      case 1:
+        return `You are on the ${simplePlan} which expires on ${planDetails.subscription_end_date}`;
+      case 2:
+        return `You are on the ${premiumPlan} which expires on ${planDetails.subscription_end_date}`;
+      default:
+        return '';
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 py-20">
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
           <h1 className="text-4xl font-bold text-gray-900 mb-4">Choose Your Plan</h1>
           <p className="text-lg text-gray-600">Select the perfect plan for your needs</p>
+          {!loading && (
+            <p className="mt-4 text-lg font-medium text-blue-600">
+              {getPlanMessage()}
+            </p>
+          )}
         </div>
 
         <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
           {/* Basic Plan */}
           <Card className="relative hover:shadow-xl transition-shadow">
             <CardHeader>
-              <CardTitle className="text-2xl">Basic Plan</CardTitle>
+              <CardTitle className="text-2xl">{simplePlan}</CardTitle>
               <CardDescription>Perfect for getting started</CardDescription>
             </CardHeader>
             <CardContent>
@@ -47,7 +102,7 @@ export default function Plans() {
               Popular
             </div>
             <CardHeader>
-              <CardTitle className="text-2xl">Premium Plan</CardTitle>
+              <CardTitle className="text-2xl">{premiumPlan}</CardTitle>
               <CardDescription>For professional users</CardDescription>
             </CardHeader>
             <CardContent>
