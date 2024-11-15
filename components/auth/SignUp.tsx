@@ -16,6 +16,8 @@ const SignUpForm = () => {
   const [password, setPassword] = useState("");
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  // Add this state for password validation
+  const [isValidPassword, setIsValidPassword] = useState(true);
 
   const supabase = createClientComponentClient();
 
@@ -106,9 +108,9 @@ const SignUpForm = () => {
           <div className="relative z-20 mt-auto">
             <blockquote className="space-y-2">
               <p className="text-lg">
-                &ldquo;Transform two weeks of legal effort into under 10
+                “Transform two weeks of legal effort into under 10
                 minutes. Scale your practice 5x with cost-effective automation
-                handling 80% of knowledge work.&rdquo;
+                handling 80% of knowledge work.”
               </p>
               <footer className="text-sm">Nyaya Nidhi</footer>
             </blockquote>
@@ -151,16 +153,24 @@ const SignUpForm = () => {
                       id="password"
                       type="password"
                       placeholder="Password"
-                      onChange={(e) => setPassword(e.target.value)}
+                      onChange={(e) => {
+                        setPassword(e.target.value);
+                        setIsValidPassword(e.target.value.length >= 6);
+                      }}
                       autoCapitalize="none"
                       autoCorrect="off"
                       disabled={loading}
                       className="bg-white text-black"
                     />
                   </div>
+                  {!isValidPassword && (
+                    <p className="text-red-500 text-xs">
+                      Password must be at least 6 characters long
+                    </p>
+                  )}
                   <Button
                     onClick={handleSignUp}
-                    disabled={loading}
+                    disabled={loading || !isValidPassword || password.length < 6}
                     className="bg-zinc-700 hover:bg-zinc-600"
                   >
                     Sign Up with Email
@@ -210,6 +220,4 @@ const SignUpForm = () => {
       </div>
     </>
   );
-};
-
-export default SignUpForm;
+};export default SignUpForm;
