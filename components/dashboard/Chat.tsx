@@ -64,9 +64,12 @@ const Chat = ({ digi_url, neutral_citation, query_id, caseName, onClose }: ChatP
       if (data.success) {
         setChatId(data.data.chat_id);
         setMessages(prev => [...prev, { role: "assistant", content: data.data.response }]);
+      } else {
+        setMessages(prev => [...prev, { role: "assistant", content: "Please try again after sometime" }]);
       }
     } catch (error) {
       console.error("Chat error:", error);
+      setMessages(prev => [...prev, { role: "assistant", content: "Please try again after sometime" }]);
     } finally {
       setIsLoading(false);
     }
