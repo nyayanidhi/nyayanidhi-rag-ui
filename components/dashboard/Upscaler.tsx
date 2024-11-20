@@ -207,7 +207,7 @@ const Upscaler = () => {
       </Dialog>
 
       <Dialog open={isLoading} onOpenChange={setIsLoading}>
-        <DialogContent className="sm:max-w-md" hideClose>
+        <DialogContent className="sm:max-w-md" >
           <DialogHeader>
             <DialogTitle>Generating Document</DialogTitle>
             <DialogDescription className="flex items-center justify-center space-x-2">
