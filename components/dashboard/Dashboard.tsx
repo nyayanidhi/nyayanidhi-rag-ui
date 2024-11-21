@@ -17,7 +17,7 @@ const Dashboard = () => {
   const [history, setHistory] = useState<SessionHistory[]>([]);
 
   useEffect(() => {
-    fetchHistory();
+  //  fetchHistory();
   }, []);
 
   const fetchHistory = async () => {
