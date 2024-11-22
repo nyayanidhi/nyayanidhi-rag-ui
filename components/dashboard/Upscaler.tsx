@@ -44,7 +44,7 @@ const Upscaler = () => {
     facts_at_hand: "",
     legal_argument: "",
     prayer_sought: "",
-    session_id: uuidv4(),
+    session_id: "",
   });
   const [isLoading, setIsLoading] = useState(false);
   const [results, setResults] = useState<any>(null);
@@ -65,12 +65,17 @@ const Upscaler = () => {
     setError({ show: false, message: "", isSubscriptionError: false });
     
     try {
+      const newSessionId = uuidv4();
+      const submissionData = {
+      ...formData,
+      session_id: newSessionId
+    };
       const response = await fetch('/api/upscaler', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(submissionData),
       });
 
       if (response.status === 403) {
