@@ -42,7 +42,7 @@ export async function POST(req: Request) {
     return NextResponse.json(
       {
         success: false,
-        data: "Failed to start upscaler request",
+        data: "Failed to start upscaler request. Please try again",
       },
       { status: error.response?.status || 500 }
     );

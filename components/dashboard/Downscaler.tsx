@@ -31,6 +31,8 @@ const Downscaler = () => {
   const [caseType, setCaseType] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
   const [results, setResults] = useState<any>(null);
+  const [isPolling, setIsPolling] = useState(false);
+  const [jobId, setJobId] = useState<string | null>(null);
   const [error, setError] = useState<{
     show: boolean;
     message: string;
@@ -61,6 +63,65 @@ const Downscaler = () => {
     }
 
     setFile(selectedFile);
+  };
+
+  const pollStatus = async (jobId: string) => {
+    try {
+      const response = await fetch('/api/downscalerStatus', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ job_id: jobId }),
+      });
+      
+      const data = await response.json();
+      console.log("Poll response:", data);
+      
+      if (!data.success) {
+        throw new Error(data.error || "Failed to check status");
+      }
+  
+      if (data.status === "COMPLETED") {
+        setResults({
+          case_details: data.data.case_details,
+          query_id: data.data.query_id
+        });
+        setShowResults(true);
+        setIsPolling(false);
+        return true;
+      } else if (data.status === "ERROR") {
+        throw new Error(data.error || "Processing failed");
+      }
+  
+      return false;
+    } catch (error: any) {
+      console.error("Polling error:", error);
+      setError({
+        show: true,
+        message: error.message || "Error processing request",
+        isSubscriptionError: false,
+      });
+      setIsPolling(false);
+      return true;
+  }
+};
+
+  const startPolling = async (jobId: string) => {
+    setIsPolling(true);
+    let isPollingActive = true;
+    
+    while (isPollingActive) {
+      const shouldStop = await pollStatus(jobId);
+      
+      if (shouldStop) {
+        isPollingActive = false;
+        setIsPolling(false);
+        break;
+      }
+      
+      await new Promise(resolve => setTimeout(resolve, 5000));
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -119,19 +180,11 @@ const Downscaler = () => {
 
       const data = await response.json();
 
-      if (data.success) {
-        setResults({
-            case_details: data.data.case_details,
-            query_id: data.data.query_id
-        });
-        setShowResults(true);
+      if (data.success && data.jobId) {
+        setJobId(data.jobId);
+        await startPolling(data.jobId);
       } else {
-        console.error('Failed to process downscaler request:', data);
-        setError({
-          show: true,
-          message: "An unexpected error occurred. Please try again.",
-          isSubscriptionError: false
-        });
+        throw new Error(data.data || "Failed to start processing");
       }
     } catch (err) {
       console.error('Error submitting form:', err);
@@ -229,17 +282,29 @@ const Downscaler = () => {
         </DialogContent>
       </Dialog>
 
-      <Dialog open={isLoading} onOpenChange={setIsLoading}>
-        <DialogContent className="sm:max-w-md" >
-          <DialogHeader>
-            <DialogTitle>Processing Document</DialogTitle>
-            <DialogDescription className="flex items-center justify-center space-x-2">
-              <Loader2 className="h-6 w-6 animate-spin" />
-              <span>Please wait while we process your request...</span>
-            </DialogDescription>
-          </DialogHeader>
-        </DialogContent>
-      </Dialog>
+      <Dialog 
+  open={isLoading || isPolling} 
+  onOpenChange={(open) => {
+    if (!isPolling) {
+      setIsLoading(open);
+    }
+  }}
+>
+  <DialogContent className="sm:max-w-md">
+    <DialogHeader>
+      <DialogTitle>Processing Document</DialogTitle>
+      <DialogDescription className="flex items-center justify-center space-x-2">
+        <Loader2 className="h-6 w-6 animate-spin" />
+        <span>
+          {isPolling 
+            ? "Processing your request. This may take a few minutes..."
+            : "Please wait while we process your request..."
+          }
+        </span>
+      </DialogDescription>
+    </DialogHeader>
+  </DialogContent>
+</Dialog>
     </>
   );
 };

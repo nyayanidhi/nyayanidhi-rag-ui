@@ -24,7 +24,7 @@ export async function POST(req: Request) {
             {
                 success: false,
                 status: "ERROR",
-                error: "Failed to check status"
+                error: "Unable to process upscaler request. Please try again after sometime."
             },
             { status: error.response?.status || 500 }
         );

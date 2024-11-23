@@ -27,7 +27,7 @@ export async function POST(req: Request) {
 
     return NextResponse.json({
       success: true,
-      data: resp.data,
+      jobId: resp.data.job_id,
     });
   } catch (error: any) {
     console.error(error);
@@ -42,23 +42,11 @@ export async function POST(req: Request) {
         { status: 403 }
       );
     }
-
-    // Handle server error (500)
-    if (error.response?.status === 500) {
-      return NextResponse.json(
-        {
-          success: false,
-          data: "Error processing request. Please try in sometime",
-        },
-        { status: 500 }
-      );
-    }
-
     // Handle other errors
     return NextResponse.json(
       {
         success: false,
-        data: "Failed to process downscaler request",
+        data: "Failed to process downscaler request. Please try again",
       },
       { status: error.response?.status || 500 }
     );
