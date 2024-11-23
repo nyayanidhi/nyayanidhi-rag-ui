@@ -11,7 +11,7 @@ export async function POST(req: Request) {
   }
 
   try {
-    // Initial request to start processing
+    // Initial request to start processing - just get the job_id
     const resp = await axios.post(
       `${process.env.NEXT_NN_WEBSITE_URL}/api/upscaler`,
       {
@@ -20,43 +20,15 @@ export async function POST(req: Request) {
       }
     );
 
-    // Get job_id from response
-    const { job_id } = resp.data;
-
-    // Poll for results
-    
-    
-    while (true) {
-      const statusResp = await axios.get(
-        `${process.env.NEXT_NN_WEBSITE_URL}/api/upscaler/status/${job_id}`
-      );
-
-      const { status, error, ...results } = statusResp.data;
-
-      if (status === "COMPLETED") {
-        return NextResponse.json({
-          success: true,
-          data: results,
-        });
-      }
-
-      if (status === "ERROR") {
-        return NextResponse.json(
-          {
-            success: false,
-            data: error || "Failed to process upscaler request",
-          },
-          { status: 500 }
-        );
-      }
-
-      await new Promise(resolve => setTimeout(resolve, 5000));
-    }
+    // Return immediately with the job_id
+    return NextResponse.json({
+      success: true,
+      jobId: resp.data.job_id,
+    });
 
   } catch (error: any) {
     console.error(error);
     
-    // Handle subscription error (403)
     if (error.response?.status === 403) {
       return NextResponse.json(
         {
@@ -67,11 +39,10 @@ export async function POST(req: Request) {
       );
     }
 
-    // Handle other errors
     return NextResponse.json(
       {
         success: false,
-        data: "Failed to process upscaler request",
+        data: "Failed to start upscaler request",
       },
       { status: error.response?.status || 500 }
     );
