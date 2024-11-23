@@ -10,7 +10,7 @@ export async function POST(req: Request) {
     return NextResponse.redirect("/login");
   }
 
-  
+  try {
     const resp = await axios.post(
       `${process.env.NEXT_NN_WEBSITE_URL}/api/upscaler`,
       {
@@ -19,11 +19,15 @@ export async function POST(req: Request) {
       }
     );
 
-    
-    
+    return NextResponse.json({
+      success: true,
+      data: resp.data,
+    });
+  } catch (error: any) {
+    console.error(error);
     
     // Handle subscription error (403)
-    if (resp?.status === 403) {
+    if (error.response?.status === 403) {
       return NextResponse.json(
         {
           success: false,
@@ -34,7 +38,7 @@ export async function POST(req: Request) {
     }
 
     // Handle server error (500)
-    if (resp?.status === 500) {
+    if (error.response?.status === 500) {
       return NextResponse.json(
         {
           success: false,
@@ -44,10 +48,13 @@ export async function POST(req: Request) {
       );
     }
 
-    return NextResponse.json({
-      success: true,
-      data: resp.data,
-    });
-  } 
     // Handle other errors
-    
+    return NextResponse.json(
+      {
+        success: false,
+        data: "Failed to process upscaler request",
+      },
+      { status: error.response?.status || 500 }
+    );
+  }
+}
