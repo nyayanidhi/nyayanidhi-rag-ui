@@ -11,6 +11,7 @@ export async function POST(req: Request) {
   }
 
   try {
+    // Initial request to start processing
     const resp = await axios.post(
       `${process.env.NEXT_NN_WEBSITE_URL}/api/upscaler`,
       {
@@ -19,10 +20,39 @@ export async function POST(req: Request) {
       }
     );
 
-    return NextResponse.json({
-      success: true,
-      data: resp.data,
-    });
+    // Get job_id from response
+    const { job_id } = resp.data;
+
+    // Poll for results
+    
+    
+    while (true) {
+      const statusResp = await axios.get(
+        `${process.env.NEXT_NN_WEBSITE_URL}/api/upscaler/status/${job_id}`
+      );
+
+      const { status, error, ...results } = statusResp.data;
+
+      if (status === "COMPLETED") {
+        return NextResponse.json({
+          success: true,
+          data: results,
+        });
+      }
+
+      if (status === "ERROR") {
+        return NextResponse.json(
+          {
+            success: false,
+            data: error || "Failed to process upscaler request",
+          },
+          { status: 500 }
+        );
+      }
+
+      await new Promise(resolve => setTimeout(resolve, 5000));
+    }
+
   } catch (error: any) {
     console.error(error);
     
@@ -34,17 +64,6 @@ export async function POST(req: Request) {
           data: "Please check your subscription plan",
         },
         { status: 403 }
-      );
-    }
-
-    // Handle server error (500)
-    if (error.response?.status === 500) {
-      return NextResponse.json(
-        {
-          success: false,
-          data: "Error processing request. Please try in sometime",
-        },
-        { status: 500 }
       );
     }
 
