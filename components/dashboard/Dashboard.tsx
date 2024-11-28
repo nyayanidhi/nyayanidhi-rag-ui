@@ -4,6 +4,8 @@ import { useState,useEffect } from "react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import Upscaler from "./Upscaler";
 import Downscaler from "./Downscaler";
+import { Label } from "../ui/label";
+
 
 type UIMode =  "upscaler" | "downscaler";
 
@@ -62,14 +64,18 @@ const Dashboard = () => {
       {/* Main Content */}
       <div className="flex-1 flex flex-col">
         {/* Mode Selector */}
+
         <div className="p-4 border-b">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
+            Research By
+          </label>
           <Select onValueChange={(value: UIMode) => setUiMode(value)} defaultValue="upscaler">
             <SelectTrigger className="w-[200px]">
               <SelectValue placeholder="Select mode" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="upscaler">Upscaler</SelectItem>
-              <SelectItem value="downscaler">Downscaler</SelectItem>
+              <SelectItem value="upscaler">Facts</SelectItem>
+              <SelectItem value="downscaler">Documents</SelectItem>
             </SelectContent>
           </Select>
         </div>

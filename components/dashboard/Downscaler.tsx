@@ -20,7 +20,7 @@ type DownscalerProps = {
   onBack: () => void;
 };
 
-const CASE_TYPES = ["CIVIL", "CRIMINAL", "SUO MOTO", "WRIT"];
+const CASE_TYPES = ["CIVIL", "CRIMINAL", "SUO MOTO", "WRIT", "ARBITRATION"];
 const ALLOWED_FILE_TYPES = [
     'application/msword', // .doc
     'application/vnd.openxmlformats-officedocument.wordprocessingml.document' // .docx

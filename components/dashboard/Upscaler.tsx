@@ -210,6 +210,7 @@ const Upscaler = () => {
                                 <SelectItem value="CRIMINAL">Criminal</SelectItem>
                                 <SelectItem value="SUO MOTO">Suo Moto</SelectItem>
                                 <SelectItem value="WRIT">Writ</SelectItem>
+                                <SelectItem value="ARBITRATION">Arbitration</SelectItem>
                             </SelectContent>
                         </Select>
                     </div>
