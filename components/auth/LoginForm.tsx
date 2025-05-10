@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
+import { AuthError } from "@supabase/supabase-js";
 
 const LoginForm = () => {
   const router = useRouter();
@@ -29,13 +30,15 @@ const LoginForm = () => {
         password,
       });
       
-      if (res.error?.code === "invalid_credentials") {
-        toast({
-          variant: "destructive",
-          title: "Authentication Error",
-          description: "Invalid email or password. Please try again.",
-        });
-        return;
+      if ('error' in res && res.error instanceof AuthError) {
+        if (res.error.message === 'Invalid login credentials') {
+          toast({
+            variant: "destructive",
+            title: "Authentication Error",
+            description: "Invalid email or password. Please try again.",
+          });
+          return;
+        }
       }
       
       router.refresh();
